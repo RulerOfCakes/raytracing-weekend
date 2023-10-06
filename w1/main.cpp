@@ -1,10 +1,19 @@
+#include "rtweekend.h"
+
 #include "color.h"
-#include "ray.h"
-#include "vec3.h"
+#include "hittable.h"
+#include "hittable_list.h"
+#include "sphere.h"
 
 #include <iostream>
 
-color ray_color(const ray &r) {
+color ray_color(const ray &r, const hittable &world) {
+  hit_record rec;
+  if (world.hit(r, interval(0, infinity), rec)) {
+    // color by unit normals
+    return 0.5 * (rec.normal + color(1, 1, 1));
+  }
+
   vec3 unit_direction = unit_vector(r.direction());
   auto a = 0.5 * (unit_direction.y() + 1.0);
   // white to blue based on y
@@ -20,6 +29,12 @@ int main() {
   // Calculate the image height, and ensure that it's at least 1.
   int image_height = static_cast<int>(image_width / aspect_ratio);
   image_height = (image_height < 1) ? 1 : image_height;
+
+  // World
+  hittable_list world;
+
+  world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
+  world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));
 
   // Camera
   auto focal_length = 1.0;
@@ -53,7 +68,7 @@ int main() {
       auto ray_direction = pixel_center - camera_center;
       ray r(camera_center, ray_direction);
 
-      color pixel_color = ray_color(r);
+      color pixel_color = ray_color(r, world);
       write_color(std::cout, pixel_color);
     }
   }
