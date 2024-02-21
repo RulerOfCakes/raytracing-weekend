@@ -42,6 +42,25 @@ public:
   double length_squared() const {
     return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
   }
+
+  static vec3 random() {
+    return vec3(random_double(), random_double(), random_double());
+  }
+
+  static vec3 random(double min, double max) {
+    return vec3(random_double(min, max), random_double(min, max),
+                random_double(min, max));
+  }
+
+  static vec3 random_gaussian() {
+    return vec3(::random_gaussian(), ::random_gaussian(), ::random_gaussian());
+  }
+
+  static vec3 random_gaussian(double mean, double stddev) {
+    return vec3(::random_gaussian(mean, stddev),
+                ::random_gaussian(mean, stddev),
+                ::random_gaussian(mean, stddev));
+  }
 };
 
 // point3 is just an alias for vec3, but useful for geometric clarity in the
@@ -85,5 +104,20 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
 }
 
 inline vec3 unit_vector(vec3 v) { return v / v.length(); }
+
+inline vec3 random_unit() {
+  auto v = vec3::random_gaussian();
+  v = unit_vector(v);
+  return v;
+}
+
+inline vec3 random_on_hemisphere(const vec3 &normal) {
+  vec3 on_unit_sphere = random_unit();
+  if (dot(on_unit_sphere, normal) > 0.0) {
+    return on_unit_sphere;
+  } else {
+    return -on_unit_sphere;
+  }
+}
 
 #endif

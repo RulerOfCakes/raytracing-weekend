@@ -4,21 +4,6 @@
 #include "hittable_list.h"
 #include "sphere.h"
 
-#include <iostream>
-
-color ray_color(const ray &r, const hittable &world) {
-  hit_record rec;
-  if (world.hit(r, interval(0, infinity), rec)) {
-    // color by unit normals
-    return 0.5 * (rec.normal + color(1, 1, 1));
-  }
-
-  vec3 unit_direction = unit_vector(r.direction());
-  auto a = 0.5 * (unit_direction.y() + 1.0);
-  // white to blue based on y
-  return (1.0 - a) * color(1.0, 1.0, 1.0) + a * color(0.5, 0.7, 1.0);
-}
-
 int main() {
 
   // Image
@@ -35,6 +20,8 @@ int main() {
 
   cam.aspect_ratio = aspect_ratio;
   cam.image_width = image_width;
+  cam.samples_per_pixel = 100;
+  cam.max_depth = 50;
 
   cam.render(world);
 }
