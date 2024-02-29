@@ -110,6 +110,14 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
 
 inline vec3 unit_vector(vec3 v) { return v / v.length(); }
 
+inline vec3 random_in_unit_disk() {
+  double r = random_double();
+  double theta = random_double(0, 2 * pi);
+  auto x = r * cos(theta);
+  auto y = r * sin(theta);
+  return vec3(x, y, 0);
+}
+
 inline vec3 random_unit() {
   auto v = vec3::random_gaussian();
   v = unit_vector(v);
