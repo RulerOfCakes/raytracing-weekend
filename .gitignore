@@ -34,3 +34,7 @@ main
 
 .DS_Store
 .vscode
+
+# Rust
+target/
+Cargo.lock
