@@ -1,13 +1,13 @@
-use rand::{Error, Rng};
+use rand::Rng;
 use rand_distr::Distribution;
 use rand_distr::NormalError;
 use std::ops;
 
 #[derive(Debug, Clone, Copy)]
-struct Vec3 {
-    x: f64,
-    y: f64,
-    z: f64,
+pub struct Vec3 {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl ops::Add for Vec3 {
