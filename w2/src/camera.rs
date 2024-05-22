@@ -10,6 +10,7 @@ pub struct Camera {
     image_height: usize,
 
     samples_per_pixel: usize,
+    pixel_samples_scale: f64,
     max_depth: usize, // recursion depth for shadow rays
 
     vfov: f64,
@@ -21,6 +22,7 @@ pub struct Camera {
     pixel_delta_u: Vec3,
     pixel_delta_v: Vec3,
 
+    // Depth of field effect
     defocus_angle: f64, // angle of camera lens cone
     focus_dist: f64,    // distance of lookfrom to the focus plane
     defocus_u: Vec3,
@@ -74,6 +76,7 @@ impl Camera {
             image_width,
             image_height,
             samples_per_pixel,
+            pixel_samples_scale: 1.0 / (samples_per_pixel as f64),
             max_depth,
             vfov,
             lookfrom,
@@ -104,7 +107,8 @@ impl Camera {
                     let r = self.get_ray(i, j);
                     pixel_color += Camera::ray_color(&r, world, self.max_depth);
                 }
-                pixel_color.write_color(out, self.samples_per_pixel)?;
+                pixel_color *= self.pixel_samples_scale;
+                pixel_color.write_color(out)?;
             }
         }
         Result::Ok(())

@@ -1,4 +1,6 @@
-use std::ops::{Add, AddAssign, Mul};
+use std::ops::{Add, AddAssign, Mul, MulAssign};
+
+use rand::random;
 
 use crate::primitive::interval::Interval;
 
@@ -29,12 +31,8 @@ impl Color {
             b: self.b.sqrt(),
         }
     }
-    pub fn write_color(
-        &self,
-        out: &mut impl std::io::Write,
-        samples_per_pixel: usize,
-    ) -> std::io::Result<()> {
-        let mut color = *self * (1.0 / samples_per_pixel as f64);
+    pub fn write_color(&self, out: &mut impl std::io::Write) -> std::io::Result<()> {
+        let mut color = *self;
         color = color.linear_to_gamma();
 
         writeln!(
@@ -44,6 +42,13 @@ impl Color {
             (256.0 * INTENSITY.clamp(color.g)) as u8,
             (256.0 * INTENSITY.clamp(color.b)) as u8
         )
+    }
+    pub fn random() -> Self {
+        Self {
+            r: random(),
+            g: random(),
+            b: random(),
+        }
     }
 }
 
@@ -68,6 +73,12 @@ impl Mul<Color> for Color {
             g: self.g * rhs.g,
             b: self.b * rhs.b,
         }
+    }
+}
+
+impl MulAssign<f64> for Color {
+    fn mul_assign(&mut self, rhs: f64) {
+        *self = *self * rhs;
     }
 }
 

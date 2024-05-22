@@ -13,4 +13,6 @@ pub trait Material: std::fmt::Debug {
     ) -> bool;
 }
 
+pub mod dielectric;
 pub mod lambertian;
+pub mod metal;

@@ -24,6 +24,9 @@ impl Material for Lambertian {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
+        // Normal is unit length
+        // we choose an arbitrary scatter direction with probability
+        // proportional to the cosine of the angle between the normal
         let mut scatter_direction = hit_record.normal + Vec3::random_unit();
         if scatter_direction.near_zero() {
             scatter_direction = hit_record.normal;

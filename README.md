@@ -8,4 +8,6 @@ my practices from [raytracing.github.io](raytracing.github.io)
 
 ## 2. [Ray Tracing: The Next Week](https://raytracing.github.io/books/RayTracingTheNextWeek.html)
 
+- [Rust implementation](/w2/)
+
 ## 3. [Ray Tracing: The Rest Of Your Life](https://raytracing.github.io/books/RayTracingTheRestOfYourLife.html)
