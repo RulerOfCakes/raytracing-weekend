@@ -1,5 +1,7 @@
 use std::rc::Rc;
 
+use aabb::AABB;
+
 use crate::{
     material::Material,
     primitive::{interval::Interval, point3::Point3, ray::Ray, vec3::Vec3},
@@ -38,7 +40,10 @@ impl HitRecord {
 
 pub trait Hittable: std::fmt::Debug {
     fn hit(&self, r: &Ray, ray_t: Interval) -> Option<HitRecord>;
+    fn bounding_box(&self) -> AABB;
+    // fn update_bounding_box(&self, time_range: Interval);
 }
 
+pub mod aabb;
 pub mod hittable_list;
 pub mod sphere;

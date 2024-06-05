@@ -87,6 +87,14 @@ impl Vec3 {
             z: 0.0,
         }
     }
+    pub fn get(&self, i: usize) -> f64 {
+        match i {
+            0 => self.x,
+            1 => self.y,
+            2 => self.z,
+            _ => panic!("Invalid index"),
+        }
+    }
     pub fn random_uniform(min: f64, max: f64) -> Vec3 {
         Vec3 {
             x: rand::thread_rng().gen_range(min..max),

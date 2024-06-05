@@ -1,10 +1,30 @@
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Interval {
     pub start: f64,
     pub end: f64,
 }
 
 impl Interval {
+    pub fn new(start: f64, end: f64) -> Interval {
+        Interval { start, end }
+    }
+    pub fn reorder(&self) -> Interval {
+        if self.start > self.end {
+            Interval {
+                start: self.end,
+                end: self.start,
+            }
+        } else {
+            *self
+        }
+    }
+    // returns the minimum enclosing interval.
+    pub fn merge(&self, other: &Interval) -> Interval {
+        Interval {
+            start: self.start.min(other.start),
+            end: self.end.max(other.end),
+        }
+    }
     pub fn size(&self) -> f64 {
         self.end - self.start
     }
@@ -19,6 +39,12 @@ impl Interval {
     }
     pub fn clamp(&self, x: f64) -> f64 {
         x.max(self.start).min(self.end)
+    }
+    pub fn expand(&self, delta: f64) -> Interval {
+        Interval {
+            start: self.start - delta,
+            end: self.end + delta,
+        }
     }
 }
 

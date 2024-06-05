@@ -5,7 +5,7 @@ use crate::{
     primitive::{interval::Interval, point3::Point3, ray::Ray, vec3::Vec3},
 };
 
-use super::{HitRecord, Hittable};
+use super::{aabb::AABB, HitRecord, Hittable};
 
 #[derive(Debug)]
 pub struct Sphere {
@@ -13,6 +13,7 @@ pub struct Sphere {
     radius: f64,
     material: Rc<dyn Material>,
     velocity: Vec3,
+    bbox: AABB,
 }
 
 impl Sphere {
@@ -22,6 +23,10 @@ impl Sphere {
             radius: radius.max(0.0),
             material,
             velocity: Vec3::zero(),
+            bbox: AABB::new_from_points(
+                center - Vec3::new(radius, radius, radius),
+                center + Vec3::new(radius, radius, radius),
+            ),
         }
     }
 
@@ -35,11 +40,16 @@ impl Sphere {
         material: Rc<dyn Material>,
         velocity: Vec3,
     ) -> Self {
+        let rvec = Vec3::new(radius, radius, radius);
+        let box1 = AABB::new_from_points(center0 - rvec, center0 + rvec);
+        let box2 = AABB::new_from_points(center0 + velocity - rvec, center0 + velocity + rvec);
+        let bbox = AABB::surrounding_box(&box1, &box2);
         Self {
             center0,
             radius: radius.max(0.0),
             material,
             velocity,
+            bbox,
         }
     }
 
@@ -82,5 +92,8 @@ impl Hittable for Sphere {
             t,
             self.material.clone(),
         ))
+    }
+    fn bounding_box(&self) -> AABB {
+        self.bbox
     }
 }

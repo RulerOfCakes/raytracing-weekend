@@ -2,11 +2,15 @@ use std::rc::Rc;
 
 use crate::primitive::{interval::Interval, ray::Ray};
 
-use super::{HitRecord, Hittable};
+use super::{
+    aabb::{AABB, EMPTY_AABB},
+    HitRecord, Hittable,
+};
 
 #[derive(Debug)]
 pub struct HittableList {
     pub objects: Vec<Rc<dyn Hittable>>,
+    bbox: AABB,
 }
 
 impl Default for HittableList {
@@ -19,10 +23,16 @@ impl HittableList {
     pub fn new() -> Self {
         Self {
             objects: Vec::new(),
+            bbox: EMPTY_AABB,
         }
     }
 
     pub fn add(&mut self, object: Rc<dyn Hittable>) {
+        if self.bbox == EMPTY_AABB {
+            self.bbox = object.bounding_box();
+        } else {
+            self.bbox = AABB::surrounding_box(&self.bbox, &object.bounding_box());
+        }
         self.objects.push(object);
     }
 }
@@ -49,5 +59,9 @@ impl Hittable for HittableList {
                 }
             })
             .0
+    }
+
+    fn bounding_box(&self) -> AABB {
+        self.bbox
     }
 }
