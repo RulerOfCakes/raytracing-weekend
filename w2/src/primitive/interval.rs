@@ -1,3 +1,4 @@
+#[derive(Debug, Clone, Copy)]
 pub struct Interval {
     pub start: f64,
     pub end: f64,

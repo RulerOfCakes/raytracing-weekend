@@ -19,7 +19,7 @@ impl Lambertian {
 impl Material for Lambertian {
     fn scatter(
         &self,
-        _r_in: &Ray,
+        r_in: &Ray,
         hit_record: &HitRecord,
         attenuation: &mut Color,
         scattered: &mut Ray,
@@ -31,7 +31,7 @@ impl Material for Lambertian {
         if scatter_direction.near_zero() {
             scatter_direction = hit_record.normal;
         }
-        *scattered = Ray::new(hit_record.p, scatter_direction);
+        *scattered = Ray::new(hit_record.p, scatter_direction, r_in.time());
         *attenuation = self.albedo;
         true
     }

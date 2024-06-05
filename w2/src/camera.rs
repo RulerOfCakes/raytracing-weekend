@@ -1,3 +1,5 @@
+use rand_distr::{Distribution, Uniform};
+
 use crate::{
     hittable::Hittable,
     primitive::{color::Color, interval::Interval, point3::Point3, ray::Ray, vec3::Vec3},
@@ -27,6 +29,9 @@ pub struct Camera {
     focus_dist: f64,    // distance of lookfrom to the focus plane
     defocus_u: Vec3,
     defocus_v: Vec3,
+
+    // time range of the current frame
+    time_step: Uniform<f64>,
 }
 
 impl Camera {
@@ -41,6 +46,7 @@ impl Camera {
         vup: Vec3,
         defocus_angle: f64,
         focus_dist: f64,
+        time_range: Interval,
     ) -> Self {
         let mut image_height = (image_width as f64 / aspect_ratio) as usize;
         if image_height < 1 {
@@ -71,6 +77,8 @@ impl Camera {
         let defocus_u = u * defocus_radius;
         let defocus_v = v * defocus_radius;
 
+        let sampler = Uniform::new(time_range.start, time_range.end);
+
         Self {
             aspect_ratio,
             image_width,
@@ -89,6 +97,7 @@ impl Camera {
             focus_dist,
             defocus_u,
             defocus_v,
+            time_step: sampler,
         }
     }
 
@@ -137,8 +146,9 @@ impl Camera {
         };
 
         let ray_dir = pixel_sample - ray_origin;
+        let time = self.time_step.sample(&mut rand::thread_rng());
 
-        Ray::new(ray_origin, ray_dir)
+        Ray::new(ray_origin, ray_dir, time)
     }
 
     fn ray_color(r: &Ray, world: &dyn Hittable, max_depth: usize) -> Color {
@@ -153,7 +163,7 @@ impl Camera {
                 end: f64::INFINITY,
             },
         ) {
-            let mut scattered = Ray::new(Vec3::zero(), Vec3::zero());
+            let mut scattered = Ray::new(Vec3::zero(), Vec3::zero(), r.time());
             let mut attenuation = Color::new(0, 0, 0);
             if rec
                 .material
