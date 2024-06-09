@@ -36,6 +36,18 @@ impl HitRecord {
         };
         (front_face, normal)
     }
+    fn min(self, other: Option<Self>) -> Self {
+        match other {
+            None => self,
+            Some(other) => {
+                if self.t < other.t {
+                    self
+                } else {
+                    other
+                }
+            }
+        }
+    }
 }
 
 pub trait Hittable: std::fmt::Debug {
@@ -45,5 +57,6 @@ pub trait Hittable: std::fmt::Debug {
 }
 
 pub mod aabb;
+pub mod bvh;
 pub mod hittable_list;
 pub mod sphere;
