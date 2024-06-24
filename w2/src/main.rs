@@ -3,7 +3,7 @@ use std::rc::Rc;
 use rand::random;
 use w2::{
     camera::Camera,
-    hittable::{hittable_list::HittableList, sphere::Sphere},
+    hittable::{bvh::BVHNode, hittable_list::HittableList, sphere::Sphere},
     material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal, Material},
     primitive::{color::Color, interval::Interval, point3::Point3, vec3::Vec3},
 };
@@ -71,6 +71,12 @@ fn main() {
         1.0,
         Rc::new(Metal::new(Color::new(0.7, 0.6, 0.5), 0.0)),
     )));
+
+    // convert world to bvh
+    let bvh_node = Rc::new(BVHNode::from(world));
+
+    world = HittableList::new();
+    world.add(bvh_node);
 
     let camera = Camera::new(
         16.0 / 9.0,

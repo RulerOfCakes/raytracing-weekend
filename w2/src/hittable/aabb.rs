@@ -28,12 +28,29 @@ impl AABB {
         let z = box0.z.merge(&box1.z);
         Self { x, y, z }
     }
-    fn axis_interval(&self, n: usize) -> Interval {
+    pub fn axis_interval(&self, n: usize) -> Interval {
         match n {
             0 => self.x,
             1 => self.y,
             2 => self.z,
             _ => panic!("Invalid axis index"),
+        }
+    }
+    pub fn longest_axis(&self) -> usize {
+        let x_size = self.x.size();
+        let y_size = self.y.size();
+        let z_size = self.z.size();
+
+        if x_size > y_size {
+            if x_size > z_size {
+                0
+            } else {
+                2
+            }
+        } else if y_size > z_size {
+            1
+        } else {
+            2
         }
     }
     pub fn hit(&self, r: &Ray, mut ray_t: Interval) -> bool {
