@@ -1,18 +1,29 @@
+use std::rc::Rc;
+
 use crate::{
     hittable::HitRecord,
     primitive::{color::Color, ray::Ray, vec3::Vec3},
+    texture::{solid_color::SolidColor, Texture},
 };
 
 use super::Material;
 
 #[derive(Debug)]
 pub struct Lambertian {
-    albedo: Color,
+    texture: Rc<dyn Texture>,
 }
 
 impl Lambertian {
     pub fn new(albedo: Color) -> Self {
-        Self { albedo }
+        Self {
+            texture: Rc::new(SolidColor::new(albedo)),
+        }
+    }
+}
+
+impl From<Rc<dyn Texture>> for Lambertian {
+    fn from(texture: Rc<dyn Texture>) -> Self {
+        Self { texture }
     }
 }
 
@@ -32,7 +43,9 @@ impl Material for Lambertian {
             scatter_direction = hit_record.normal;
         }
         *scattered = Ray::new(hit_record.p, scatter_direction, r_in.time());
-        *attenuation = self.albedo;
+        *attenuation = self
+            .texture
+            .value(hit_record.u, hit_record.v, &hit_record.p);
         true
     }
 }

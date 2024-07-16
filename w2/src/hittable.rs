@@ -12,18 +12,24 @@ pub struct HitRecord {
     pub p: Point3,
     pub normal: Vec3,
     pub material: Rc<dyn Material>,
-    pub t: f64,
+    pub t: f64, // ray parameter
+    pub u: f64, // texture coordinate
+    pub v: f64, // texture coordinate
     pub front_face: bool,
 }
 
 impl HitRecord {
     fn new(p: Point3, ray: &Ray, outward_normal: Vec3, t: f64, material: Rc<dyn Material>) -> Self {
         let (front_face, normal) = Self::face_normal(ray, outward_normal);
+        // TODO: properly calculate u/v
+
         Self {
             p,
             normal,
             material,
             t,
+            u: 0.0,
+            v: 0.0,
             front_face,
         }
     }

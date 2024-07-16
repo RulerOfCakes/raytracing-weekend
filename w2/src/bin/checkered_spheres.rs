@@ -1,4 +1,4 @@
-use w2::samples::{bouncing_spheres::bouncing_spheres, checkered_spheres::checkered_spheres};
+use w2::samples::checkered_spheres::checkered_spheres;
 
 fn main() {
     let mut out = std::io::stdout().lock();

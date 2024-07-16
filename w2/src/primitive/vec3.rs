@@ -1,3 +1,4 @@
+use rand::random;
 use rand::Rng;
 use rand_distr::Distribution;
 use rand_distr::NormalError;
@@ -119,12 +120,13 @@ impl Vec3 {
     pub fn random_in_disk(radius: f64) -> Vec3 {
         let r = rand::thread_rng().gen_range(0.0..radius);
         let theta = rand::thread_rng().gen_range(0.0..2.0 * std::f64::consts::PI);
-
-        Vec3 {
+        let point = Vec3 {
             x: r * theta.cos(),
             y: r * theta.sin(),
             z: 0.0,
-        }
+        };
+        // multiply with sqrt to ensure spraed distribution
+        point * random::<f64>().sqrt()
     }
     pub fn length(&self) -> f64 {
         self.length_squared().sqrt()
