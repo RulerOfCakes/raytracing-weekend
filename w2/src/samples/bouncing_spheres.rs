@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    camera::Camera,
+    camera::{Camera, CameraOptionsBuilder},
     hittable::{bvh::BVHNode, hittable_list::HittableList, sphere::Sphere},
     material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal, Material},
     primitive::{color::Color, interval::Interval, point3::Point3, vec3::Vec3},
@@ -86,21 +86,21 @@ pub fn bouncing_spheres(out: &mut impl std::io::Write) -> std::io::Result<()> {
     world = HittableList::new();
     world.add(bvh_node);
 
-    let camera = Camera::new(
-        16.0 / 9.0,
-        600,
-        50,
-        50,
-        20.0,
-        Vec3::new(13., 2., 3.),
-        Vec3::new(0., 0., 0.),
-        Vec3::new(0.0, 1.0, 0.0),
-        0.6,
-        10.0,
-        Interval {
-            start: 0.0,
-            end: 1.0,
-        },
-    );
+    let opts = CameraOptionsBuilder::default()
+        .aspect_ratio(16. / 9.)
+        .image_width(600)
+        .samples_per_pixel(50)
+        .max_depth(50)
+        .vfov(20.)
+        .lookfrom(Point3::new(13., 2., 3.))
+        .lookat(Point3::zero())
+        .vup(Vec3::new(0., 1., 0.))
+        .defocus_angle(0.6)
+        .focus_dist(10.)
+        .time_range(Interval::new(0., 1.))
+        .build()
+        .unwrap();
+
+    let camera = opts.build();
     camera.render(&world, out)
 }

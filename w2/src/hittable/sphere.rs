@@ -56,6 +56,17 @@ impl Sphere {
     fn center(&self, time: f64) -> Point3 {
         self.center0 + self.velocity * time
     }
+
+    // returns (u, v) coordinates in range ([0,1], [0,1])
+    fn get_uv(p: &Point3) -> (f64, f64) {
+        let theta = (-p.y).acos();
+        // with offset to wrap angles from range [-pi, pi] to [0, 2*pi]
+        let phi = (-p.z).atan2(p.x) + std::f64::consts::PI;
+        (
+            phi / (2.0 * std::f64::consts::PI), // u
+            theta / std::f64::consts::PI,       // v
+        )
+    }
 }
 
 impl Hittable for Sphere {
@@ -85,11 +96,15 @@ impl Hittable for Sphere {
         let t = root;
         let p = r.at(t);
         let outward_normal = (p - center) / self.radius;
+
+        let (u, v) = Sphere::get_uv(&outward_normal);
         Some(HitRecord::new(
             p,
             r,
             outward_normal,
             t,
+            u,
+            v,
             self.material.clone(),
         ))
     }

@@ -1,3 +1,4 @@
+use derive_builder::Builder;
 use rand_distr::{Distribution, Uniform};
 
 use crate::{
@@ -5,15 +6,37 @@ use crate::{
     primitive::{color::Color, interval::Interval, point3::Point3, ray::Ray, vec3::Vec3},
 };
 
+#[derive(Builder, Debug)]
+pub struct CameraOptions {
+    pub aspect_ratio: f64,
+    pub image_width: u32,
+    pub samples_per_pixel: u32,
+    pub max_depth: u32,
+    pub vfov: f64,
+    pub lookfrom: Vec3,
+    pub lookat: Vec3,
+    pub vup: Vec3,
+    pub defocus_angle: f64,
+    #[builder(default = "10.")]
+    pub focus_dist: f64,
+    pub time_range: Interval,
+}
+
+impl CameraOptions {
+    pub fn build(self) -> Camera {
+        Camera::new(self)
+    }
+}
+
 #[derive(Debug)]
 pub struct Camera {
     aspect_ratio: f64,
-    image_width: usize,
-    image_height: usize,
+    image_width: u32,
+    image_height: u32,
 
-    samples_per_pixel: usize,
+    samples_per_pixel: u32,
     pixel_samples_scale: f64,
-    max_depth: usize, // recursion depth for shadow rays
+    max_depth: u32, // recursion depth for shadow rays
 
     vfov: f64,
     lookfrom: Point3, // Camera center
@@ -36,19 +59,21 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(
-        aspect_ratio: f64,
-        image_width: usize,
-        samples_per_pixel: usize,
-        max_depth: usize,
-        vfov: f64,
-        lookfrom: Vec3,
-        lookat: Vec3,
-        vup: Vec3,
-        defocus_angle: f64,
-        focus_dist: f64,
-        time_range: Interval,
+        CameraOptions {
+            aspect_ratio,
+            image_width,
+            samples_per_pixel,
+            max_depth,
+            vfov,
+            lookfrom,
+            lookat,
+            vup,
+            defocus_angle,
+            focus_dist,
+            time_range,
+        }: CameraOptions,
     ) -> Self {
-        let mut image_height = (image_width as f64 / aspect_ratio) as usize;
+        let mut image_height = (image_width as f64 / aspect_ratio) as u32;
         if image_height < 1 {
             image_height = 1;
         }
@@ -113,7 +138,7 @@ impl Camera {
             for i in 0..self.image_width {
                 let mut pixel_color = Color::new(0, 0, 0);
                 for _ in 0..self.samples_per_pixel {
-                    let r = self.get_ray(i, j);
+                    let r = self.get_ray(i as usize, j as usize);
                     pixel_color += Camera::ray_color(&r, world, self.max_depth);
                 }
                 pixel_color *= self.pixel_samples_scale;
@@ -151,7 +176,7 @@ impl Camera {
         Ray::new(ray_origin, ray_dir, time)
     }
 
-    fn ray_color(r: &Ray, world: &dyn Hittable, max_depth: usize) -> Color {
+    fn ray_color(r: &Ray, world: &dyn Hittable, max_depth: u32) -> Color {
         if max_depth == 0 {
             return Color::new(0, 0, 0);
         }

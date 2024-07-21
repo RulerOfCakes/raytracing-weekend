@@ -19,7 +19,15 @@ pub struct HitRecord {
 }
 
 impl HitRecord {
-    fn new(p: Point3, ray: &Ray, outward_normal: Vec3, t: f64, material: Rc<dyn Material>) -> Self {
+    fn new(
+        p: Point3,
+        ray: &Ray,
+        outward_normal: Vec3,
+        t: f64,
+        u: f64,
+        v: f64,
+        material: Rc<dyn Material>,
+    ) -> Self {
         let (front_face, normal) = Self::face_normal(ray, outward_normal);
         // TODO: properly calculate u/v
 
@@ -28,8 +36,8 @@ impl HitRecord {
             normal,
             material,
             t,
-            u: 0.0,
-            v: 0.0,
+            u,
+            v,
             front_face,
         }
     }

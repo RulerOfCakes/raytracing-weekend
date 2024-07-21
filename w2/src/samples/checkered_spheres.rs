@@ -1,14 +1,14 @@
-use std::rc::Rc;
+use std::{error::Error, rc::Rc};
 
 use crate::{
-    camera::Camera,
+    camera::{Camera, CameraOptions, CameraOptionsBuilder},
     hittable::{hittable_list::HittableList, sphere::Sphere},
     material::lambertian::Lambertian,
     primitive::{color::Color, interval::Interval, point3::Point3},
     texture::{checker_texture::CheckerTexture, solid_color::SolidColor, Texture},
 };
 
-pub fn checkered_spheres(out: &mut impl std::io::Write) -> std::io::Result<()> {
+pub fn checkered_spheres(out: &mut impl std::io::Write) -> Result<(), Box<dyn Error>> {
     let mut world = HittableList::new();
 
     let checker: Rc<dyn Texture> = Rc::new(CheckerTexture::new(
@@ -28,19 +28,21 @@ pub fn checkered_spheres(out: &mut impl std::io::Write) -> std::io::Result<()> {
         Rc::new(Lambertian::from(checker.clone())),
     )));
 
-    let cam = Camera::new(
-        16. / 9.,
-        400,
-        100,
-        50,
-        20.,
-        Point3::new(13., 2., 3.),
-        Point3::new(0., 0., 0.),
-        Point3::new(0., 1., 0.),
-        0.,
-        10.,
-        Interval::new(0., 1.),
-    );
+    let opts = CameraOptionsBuilder::default()
+        .aspect_ratio(16. / 9.)
+        .image_width(400)
+        .samples_per_pixel(100)
+        .max_depth(50)
+        .lookfrom(Point3::new(13., 2., 3.))
+        .lookat(Point3::new(0., 0., 0.))
+        .vup(Point3::new(0., 1., 0.))
+        .vfov(20.)
+        .defocus_angle(0.)
+        .focus_dist(10.)
+        .time_range(Interval::new(0., 1.))
+        .build()?;
+    let cam = opts.build();
 
-    cam.render(&world, out)
+    cam.render(&world, out)?;
+    Ok(())
 }

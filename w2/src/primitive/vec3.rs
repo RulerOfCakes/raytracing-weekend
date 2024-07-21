@@ -11,6 +11,16 @@ pub struct Vec3 {
     pub z: f64,
 }
 
+impl Default for Vec3 {
+    fn default() -> Self {
+        Self {
+            x: Default::default(),
+            y: Default::default(),
+            z: Default::default(),
+        }
+    }
+}
+
 impl ops::Add for Vec3 {
     type Output = Vec3;
     fn add(self, other: Vec3) -> Vec3 {
