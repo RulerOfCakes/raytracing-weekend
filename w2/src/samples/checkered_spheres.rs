@@ -1,7 +1,7 @@
 use std::{error::Error, rc::Rc};
 
 use crate::{
-    camera::{Camera, CameraOptions, CameraOptionsBuilder},
+    camera::CameraOptionsBuilder,
     hittable::{hittable_list::HittableList, sphere::Sphere},
     material::lambertian::Lambertian,
     primitive::{color::Color, interval::Interval, point3::Point3},

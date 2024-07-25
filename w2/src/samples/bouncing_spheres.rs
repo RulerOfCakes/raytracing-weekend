@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    camera::{Camera, CameraOptionsBuilder},
+    camera::CameraOptionsBuilder,
     hittable::{bvh::BVHNode, hittable_list::HittableList, sphere::Sphere},
     material::{dielectric::Dielectric, lambertian::Lambertian, metal::Metal, Material},
     primitive::{color::Color, interval::Interval, point3::Point3, vec3::Vec3},

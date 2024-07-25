@@ -17,6 +17,8 @@ impl ImageTexture {
     }
 
     // We use the following formula to linearize it, as we apply gamma correction at render time.
+    // Because we use sqrt approximation, this formula should suffice,
+    // However for more accurate linearization, we should follow the sRGB standard via crates such as `palette`.
     fn linearize(image: &DynamicImage) -> Option<DynamicImage> {
         let img_bytes: Vec<u8> = image
             .as_bytes()
