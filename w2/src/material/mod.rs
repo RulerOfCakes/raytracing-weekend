@@ -1,18 +1,25 @@
 use crate::{
     hittable::HitRecord,
-    primitive::{color::Color, ray::Ray},
+    primitive::{color::Color, point3::Point3, ray::Ray},
 };
 
 pub trait Material: std::fmt::Debug {
     fn scatter(
         &self,
-        r_in: &Ray,
-        hit_record: &HitRecord,
-        attenuation: &mut Color,
-        scattered: &mut Ray,
-    ) -> bool;
+        _r_in: &Ray,
+        _hit_record: &HitRecord,
+        _attenuation: &mut Color,
+        _scattered: &mut Ray,
+    ) -> bool {
+        false
+    }
+
+    fn emitted(&self, _u: f64, _v: f64, _p: &Point3) -> Color {
+        Color::new(0.0, 0.0, 0.0)
+    }
 }
 
 pub mod dielectric;
+pub mod diffuse_light;
 pub mod lambertian;
 pub mod metal;

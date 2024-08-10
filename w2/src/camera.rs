@@ -8,18 +8,24 @@ use crate::{
 
 #[derive(Builder, Debug)]
 pub struct CameraOptions {
-    pub aspect_ratio: f64,
-    pub image_width: u32,
-    pub samples_per_pixel: u32,
-    pub max_depth: u32,
-    pub vfov: f64,
-    pub lookfrom: Vec3,
-    pub lookat: Vec3,
-    pub vup: Vec3,
-    pub defocus_angle: f64,
+    #[builder(default = "1.")]
+    aspect_ratio: f64,
+    image_width: u32,
+    #[builder(default = "10")]
+    samples_per_pixel: u32,
+    #[builder(default = "10")]
+    max_depth: u32,
+    vfov: f64,
+    lookfrom: Vec3,
+    lookat: Vec3,
+    vup: Vec3,
+    defocus_angle: f64,
     #[builder(default = "10.")]
-    pub focus_dist: f64,
-    pub time_range: Interval,
+    focus_dist: f64,
+    #[builder(default = "Interval { start: 0., end: 1. }")]
+    time_range: Interval,
+    #[builder(default = "Color::new(0.7, 0.8, 1.0)")] // Default sky blue
+    background: Color,
 }
 
 impl CameraOptions {
@@ -55,6 +61,9 @@ pub struct Camera {
 
     // time range of the current frame
     time_step: Uniform<f64>,
+
+    // background color
+    background: Color,
 }
 
 impl Camera {
@@ -71,6 +80,7 @@ impl Camera {
             defocus_angle,
             focus_dist,
             time_range,
+            background,
         }: CameraOptions,
     ) -> Self {
         let mut image_height = (image_width as f64 / aspect_ratio) as u32;
@@ -123,6 +133,7 @@ impl Camera {
             defocus_u,
             defocus_v,
             time_step: sampler,
+            background,
         }
     }
 
@@ -139,7 +150,7 @@ impl Camera {
                 let mut pixel_color = Color::new(0, 0, 0);
                 for _ in 0..self.samples_per_pixel {
                     let r = self.get_ray(i as usize, j as usize);
-                    pixel_color += Camera::ray_color(&r, world, self.max_depth);
+                    pixel_color += self.ray_color(&r, world, self.max_depth);
                 }
                 pixel_color *= self.pixel_samples_scale;
                 pixel_color.write_color(out)?;
@@ -176,7 +187,7 @@ impl Camera {
         Ray::new(ray_origin, ray_dir, time)
     }
 
-    fn ray_color(r: &Ray, world: &dyn Hittable, max_depth: u32) -> Color {
+    fn ray_color(&self, r: &Ray, world: &dyn Hittable, max_depth: u32) -> Color {
         if max_depth == 0 {
             return Color::new(0, 0, 0);
         }
@@ -188,6 +199,7 @@ impl Camera {
                 end: f64::INFINITY,
             },
         ) {
+            let emitted = rec.material.emitted(rec.u, rec.v, &rec.p);
             let mut scattered = Ray::new(Vec3::zero(), Vec3::zero(), r.time());
             let mut attenuation = Color::new(0, 0, 0);
             if rec
@@ -195,14 +207,12 @@ impl Camera {
                 .scatter(r, &rec, &mut attenuation, &mut scattered)
                 && max_depth > 0
             {
-                attenuation * Camera::ray_color(&scattered, world, max_depth - 1)
+                emitted + attenuation * self.ray_color(&scattered, world, max_depth - 1)
             } else {
-                Color::new(0, 0, 0)
+                emitted
             }
         } else {
-            let unit_direction = r.direction().unit();
-            let t = 0.5 * (unit_direction.y + 1.0);
-            Color::new(1, 1, 1) * (1.0 - t) + Color::new(0.5, 0.7, 1.0) * t
+            self.background
         }
     }
 }

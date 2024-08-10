@@ -2,10 +2,9 @@ use std::{error::Error, io::Write, rc::Rc};
 
 use crate::{
     camera::CameraOptionsBuilder,
-    hittable::{hittable_list::HittableList, quad::Quad, sphere::Sphere},
-    material::{lambertian::Lambertian, Material},
+    hittable::{hittable_list::HittableList, quad::Quad},
+    material::lambertian::Lambertian,
     primitive::{color::Color, interval::Interval, point3::Point3, vec3::Vec3},
-    texture::{image_texture::ImageTexture, Texture},
 };
 pub fn quads(out: &mut impl Write) -> Result<(), Box<dyn Error>> {
     let mut world = HittableList::new();
