@@ -73,4 +73,5 @@ pub trait Hittable: std::fmt::Debug {
 pub mod aabb;
 pub mod bvh;
 pub mod hittable_list;
+pub mod quad;
 pub mod sphere;

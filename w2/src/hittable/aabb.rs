@@ -14,19 +14,37 @@ pub struct AABB {
 
 impl AABB {
     pub fn new(x: Interval, y: Interval, z: Interval) -> Self {
-        Self { x, y, z }
+        Self { x, y, z }.pad_to_minimums()
     }
     pub fn new_from_points(p0: Point3, p1: Point3) -> Self {
         let x = Interval::new(p0.x, p1.x).reorder();
         let y = Interval::new(p0.y, p1.y).reorder();
         let z = Interval::new(p0.z, p1.z).reorder();
+        Self { x, y, z }.pad_to_minimums()
+    }
+    /// Add paddings if necessary to make the intervals non-zero.
+    fn pad_to_minimums(self) -> Self {
+        let delta = 0.0001;
+        let mut x = self.x;
+        let mut y = self.y;
+        let mut z = self.z;
+        if self.x.size() < delta {
+            x = self.x.expand(delta);
+        }
+        if self.y.size() < delta {
+            y = self.y.expand(delta);
+        }
+        if self.z.size() < delta {
+            z = self.z.expand(delta);
+        }
+
         Self { x, y, z }
     }
     pub fn surrounding_box(box0: &AABB, box1: &AABB) -> Self {
         let x = box0.x.merge(&box1.x);
         let y = box0.y.merge(&box1.y);
         let z = box0.z.merge(&box1.z);
-        Self { x, y, z }
+        Self { x, y, z }.pad_to_minimums()
     }
     pub fn axis_interval(&self, n: usize) -> Interval {
         match n {
