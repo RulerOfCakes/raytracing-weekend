@@ -29,7 +29,6 @@ impl HitRecord {
         material: Rc<dyn Material>,
     ) -> Self {
         let (front_face, normal) = Self::face_normal(ray, outward_normal);
-        // TODO: properly calculate u/v
 
         Self {
             p,
@@ -39,6 +38,12 @@ impl HitRecord {
             u,
             v,
             front_face,
+        }
+    }
+    fn translate(self, offset: Vec3) -> Self {
+        Self {
+            p: self.p + offset,
+            ..self
         }
     }
     fn face_normal(r: &Ray, outward_normal: Vec3) -> (bool, Vec3) {
@@ -74,4 +79,6 @@ pub mod aabb;
 pub mod bvh;
 pub mod hittable_list;
 pub mod quad;
+pub mod rotate_y;
 pub mod sphere;
+pub mod translate;

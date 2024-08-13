@@ -5,7 +5,7 @@ use crate::{
     primitive::{interval::Interval, point3::Point3, ray::Ray, vec3::Vec3},
 };
 
-use super::{aabb::AABB, HitRecord, Hittable};
+use super::{aabb::AABB, hittable_list::HittableList, HitRecord, Hittable};
 
 #[derive(Debug)]
 pub struct Quad {
@@ -84,4 +84,24 @@ impl Hittable for Quad {
     fn bounding_box(&self) -> AABB {
         self.bbox
     }
+}
+
+pub fn box_from_quads(a: Point3, b: Point3, mat: Rc<dyn Material>) -> HittableList {
+    let mut sides = HittableList::new();
+
+    let min = Point3::new(a.x.min(b.x), a.y.min(b.y), a.z.min(b.z));
+    let max = Point3::new(a.x.max(b.x), a.y.max(b.y), a.z.max(b.z));
+
+    let dx = Vec3::new(max.x - min.x, 0.0, 0.0);
+    let dy = Vec3::new(0.0, max.y - min.y, 0.0);
+    let dz = Vec3::new(0.0, 0.0, max.z - min.z);
+
+    sides.add(Rc::new(Quad::new(min, dx, dy, mat.clone())));
+    sides.add(Rc::new(Quad::new(min, dx, dz, mat.clone())));
+    sides.add(Rc::new(Quad::new(min, dy, dz, mat.clone())));
+    sides.add(Rc::new(Quad::new(max, -dx, -dy, mat.clone())));
+    sides.add(Rc::new(Quad::new(max, -dx, -dz, mat.clone())));
+    sides.add(Rc::new(Quad::new(max, -dy, -dz, mat.clone())));
+
+    sides
 }

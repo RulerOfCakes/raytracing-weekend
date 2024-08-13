@@ -1,15 +1,18 @@
+use std::ops::Add;
+
 use crate::primitive::{
     interval::{Interval, EMPTY_INTERVAL},
     point3::Point3,
     ray::Ray,
+    vec3::Vec3,
 };
 
 // Axis-Aligned Bounding Box
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct AABB {
-    x: Interval,
-    y: Interval,
-    z: Interval,
+    pub x: Interval,
+    pub y: Interval,
+    pub z: Interval,
 }
 
 impl AABB {
@@ -95,6 +98,17 @@ impl AABB {
             }
         }
         true
+    }
+}
+
+impl Add<Vec3> for AABB {
+    type Output = Self;
+
+    fn add(self, rhs: Vec3) -> Self::Output {
+        let x = self.x + rhs.x;
+        let y = self.y + rhs.y;
+        let z = self.z + rhs.z;
+        Self::new(x, y, z)
     }
 }
 

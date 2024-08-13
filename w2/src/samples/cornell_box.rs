@@ -2,7 +2,12 @@ use std::{error::Error, io::Write, rc::Rc};
 
 use crate::{
     camera::CameraOptionsBuilder,
-    hittable::{hittable_list::HittableList, quad::Quad},
+    hittable::{
+        hittable_list::HittableList,
+        quad::{box_from_quads, Quad},
+        rotate_y::RotateY,
+        translate::Translate,
+    },
     material::{diffuse_light::DiffuseLight, lambertian::Lambertian},
     primitive::{color::Color, point3::Point3, vec3::Vec3},
 };
@@ -56,6 +61,26 @@ pub fn cornell_box(out: &mut impl Write) -> Result<(), Box<dyn Error>> {
         Vec3::new(0., 555., 0.),
         white.clone(),
     )));
+
+    // Boxes
+
+    let box1 = Rc::new(box_from_quads(
+        Point3::new(0., 0., 0.),
+        Point3::new(165., 330., 165.),
+        white.clone(),
+    ));
+    let box1 = Rc::new(RotateY::new(box1, 15.));
+    let box1 = Rc::new(Translate::new(box1, Vec3::new(265., 0., 295.)));
+    world.add(box1);
+
+    let box2 = Rc::new(box_from_quads(
+        Point3::new(0., 0., 0.),
+        Point3::new(165., 165., 165.),
+        white.clone(),
+    ));
+    let box2 = Rc::new(RotateY::new(box2, -18.));
+    let box2 = Rc::new(Translate::new(box2, Vec3::new(130., 0., 65.)));
+    world.add(box2);
 
     let cam_opts = CameraOptionsBuilder::default()
         .aspect_ratio(1.)

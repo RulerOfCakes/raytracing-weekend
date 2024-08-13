@@ -106,6 +106,14 @@ impl Vec3 {
             _ => panic!("Invalid index"),
         }
     }
+    pub fn set(&mut self, i: usize, value: f64) {
+        match i {
+            0 => self.x = value,
+            1 => self.y = value,
+            2 => self.z = value,
+            _ => panic!("Invalid index"),
+        }
+    }
     pub fn random_uniform(min: f64, max: f64) -> Vec3 {
         Vec3 {
             x: rand::thread_rng().gen_range(min..max),
