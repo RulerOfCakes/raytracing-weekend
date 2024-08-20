@@ -3,6 +3,7 @@ use std::{error::Error, io::Write, rc::Rc};
 use crate::{
     camera::CameraOptionsBuilder,
     hittable::{
+        constant_medium::ConstantMedium,
         hittable_list::HittableList,
         quad::{box_from_quads, Quad},
         rotate_y::RotateY,
@@ -71,7 +72,6 @@ pub fn cornell_box(out: &mut impl Write) -> Result<(), Box<dyn Error>> {
     ));
     let box1 = Rc::new(RotateY::new(box1, 15.));
     let box1 = Rc::new(Translate::new(box1, Vec3::new(265., 0., 295.)));
-    world.add(box1);
 
     let box2 = Rc::new(box_from_quads(
         Point3::new(0., 0., 0.),
@@ -80,7 +80,20 @@ pub fn cornell_box(out: &mut impl Write) -> Result<(), Box<dyn Error>> {
     ));
     let box2 = Rc::new(RotateY::new(box2, -18.));
     let box2 = Rc::new(Translate::new(box2, Vec3::new(130., 0., 65.)));
-    world.add(box2);
+
+    let box1_volume = Rc::new(ConstantMedium::new_from_color(
+        box1,
+        0.01,
+        Color::new(0., 0., 0.),
+    ));
+    let box2_volume = Rc::new(ConstantMedium::new_from_color(
+        box2,
+        0.01,
+        Color::new(1., 1., 1.),
+    ));
+
+    world.add(box1_volume);
+    world.add(box2_volume);
 
     let cam_opts = CameraOptionsBuilder::default()
         .aspect_ratio(1.)
